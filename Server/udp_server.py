@@ -7,6 +7,7 @@
 import json
 import socket
 import time
+import threading
 
 
 # Ok so things look different but its the same general idea...
@@ -31,7 +32,7 @@ class Server:
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
     def send_message(self, msg, addr):
-        self.sock.sendto(msg.encode(), addr) #iterate?
+        self.sock.sendto(msg.encode(), addr)
 
     def get_username(self, addr):
         #if known but newly connected, if known but not newly connected, if unknown and newly connected, if unknown and not newly connected
@@ -70,6 +71,7 @@ class Server:
         with open('knownUsers.json', 'w') as file:
             json.dump(self.known_ips, file)
 
+
     def command(self, data, addr):
         if data[0:12] == "/changename ":
             self.change_username(addr, data[12:50])  # limit lenght of username i guess
@@ -83,10 +85,13 @@ class Server:
         elif data == "/connect":
             self.current_msg += self.get_username(addr) + " connected"
 
+        elif data == "/disconnect":
+            self.current_msg += self.get_username(addr) + " disconnected"
+            self.session_ips.pop(addr)
+
         else:
             self.current_msg += "Invalid command, for list of commands use '/help'"
 
-# maybe ping clients once every several seconds, and remove them from connected list if they don't respond?
 
     def run(self):
         # bind our socket to the given address/port
