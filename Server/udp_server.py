@@ -15,7 +15,7 @@ import time
 # Current message logic is not great... this was a temp thing...
 # The entire server needs to go to multicast... we should talk about what this means
 # If that happens there needs to be some data restructuring ... coolbeans
-# and i need to add more comments yeah yeah yeah cool.
+
 class Server:
 	UDP_ADDRESS = ""
 	UDP_PORT = 0
@@ -113,5 +113,5 @@ class Server:
 			self.current_msg = ""
 
 if __name__ == '__main__':
-	server = Server("<YOUR IP HERE>", 9000)
+	server = Server('<YOUR IP HERE>', 9000)
 	server.run()

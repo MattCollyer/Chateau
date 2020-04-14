@@ -9,7 +9,7 @@
 import socket
 
 
-UDP_ADDRESS = "<YOUR IP HERE>"
+UDP_ADDRESS = '<YOUR IP HERE>'
 UDP_PORT = 9000
 
 # first, create the socket - DGRAM == UDP
