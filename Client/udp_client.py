@@ -1,10 +1,8 @@
 #!/usr/bin/env python3
 """
-    udp_client.py - UDP client that talks to a remote server on UDP port 9000 and sends a simple message, and reads
-                back what the server sent to it.
-    Author: Andrew Cencini (acencini@bennington.edu)
-    actually not anymore. update this
-    Date: 3/4/2020
+    udp_client.py - UDP client that talks to a remote chat server on UDP port 9000.
+    Authors: Matt & Ell
+    Date: 4/10/2020
 
 """
 
@@ -12,32 +10,46 @@ import socket
 import sys
 
 
-UDP_ADDRESS = '127.0.0.1'
-UDP_PORT = 9000
+class Client:
 
-# first, create the socket - DGRAM == UDP
-sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+	UDP_ADDRESS = ''
+	UDP_PORT = 0
+	sock = None
 
-# set timeout in case the server doesn't call us back
-sock.settimeout(5)
+	def __init__(self, udp_addr = '127.0.0.1', udp_port = 9000):
+		self.UDP_ADDRESS = udp_addr
+		self.UDP_PORT = udp_port
+		self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
-sock.sendto("/connect".encode(), (UDP_ADDRESS, UDP_PORT))
 
-print("Type a message and press enter to send! Type /disconnect to quit.")
-
-while True:
-	try:
-		data, addr = sock.recvfrom(1024)
-		print(data.decode())
-		message = input()
-		if (message == "/disconnect"):
-			print("Disconnected")
-			sock.sendto("/disconnect".encode(), (UDP_ADDRESS, UDP_PORT))
-			break
-		sock.sendto(message.encode(), (UDP_ADDRESS, UDP_PORT))
-	except KeyboardInterrupt:
+	def disconnect(self):
+		# Sends a message to the chat server in order to be taken off the list
 		print("Disconnected")
-		sock.sendto("/disconnect".encode(), (UDP_ADDRESS, UDP_PORT))
-		sys.exit()
+		self.sock.sendto("/disconnect".encode(), (self.UDP_ADDRESS, self.UDP_PORT))
 
 
+
+	def connect(self):
+		# set timeout in case the server doesn't call us back
+		self.sock.settimeout(5)
+		self.sock.sendto("/connect".encode(), (self.UDP_ADDRESS, self.UDP_PORT))
+		print("Type a message and press enter to send! Type /disconnect to quit.")
+
+		while True:
+			try:
+				data, addr = self.sock.recvfrom(1024)
+				print(data.decode())
+				message = input()
+				if (message == "/disconnect"):
+					self.disconnect()
+					break
+				self.sock.sendto(message.encode(), (self.UDP_ADDRESS, self.UDP_PORT))
+			# You can also just control + C ;)
+			except KeyboardInterrupt:
+				self.disconnect()
+				sys.exit()
+
+
+if __name__ == '__main__':
+	client = Client()
+	client.connect()
